@@ -1,32 +1,29 @@
-import { TodosAccess } from './todosAcess'
+import { TodosAccess } from '../helpers/todosAcess'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import * as uuid from 'uuid'
 import { TodoUpdate } from '../models/TodoUpdate';
 import { createLogger } from '../utils/logger'
-import { AttachmentUtils } from './attachmentUtils'
 
-const attUtils = new AttachmentUtils()
 // TODO: Implement businessLogic
 const logger = createLogger('helpers-todos')
 const todosAcess = new TodosAccess()
 
 export async function createTodo(userId: string, todo: CreateTodoRequest): Promise<TodoItem> {
 
-    const createdAt = new Date().toISOString()
-    const todoId = uuid.v4()
-    await attUtils.createAttachmentPresignedUrl(todoId)
-    const attachmentUrl = await attUtils.getAttachmentUrl(todoId)
-    
-   return await todosAcess.createTodo({
+  const createdAt = new Date().toISOString()  
+  const todoId = uuid.v4()
+  let newItem: TodoItem = {
     userId,
     todoId,
     createdAt,
     done: false,
     ...todo,
-    attachmentUrl: attachmentUrl
-   });
+    attachmentUrl: ''
+  }
+  logger.info('call todos.createTodo: ' + newItem);
+  return await todosAcess.createTodo(newItem)
 
 }
 
