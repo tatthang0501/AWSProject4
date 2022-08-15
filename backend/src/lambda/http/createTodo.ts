@@ -4,13 +4,24 @@ import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { getUserId } from '../utils';
-import { createTodo } from '../../helpers/todos'
+import { createTodo } from '../../businessLogic/todos'
 
 export const handler = middy( async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
+
+    // Return error if todo name is empty
+    if(newTodo.name == '' || newTodo.name == undefined){
+      return {
+        statusCode: 400,
+        headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+        body: "Todo name cannot be empty"
+      }
+    }
     // TODO: Implement creating a new TODO item
     const userId = getUserId(event)
-    const result = await createTodo(userId, newTodo)
+    const item = await createTodo(userId, newTodo)
 
     return {
       statusCode: 201,
@@ -18,7 +29,7 @@ export const handler = middy( async (event: APIGatewayProxyEvent): Promise<APIGa
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        result
+        item
       })
     }
   }
