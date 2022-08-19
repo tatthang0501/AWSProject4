@@ -11,10 +11,10 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createTodo, deleteTodo, getDownloadUrl, getTodos, patchTodo, deleteAttachment, download } from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
 
@@ -47,7 +47,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
     try {
       const dueDate = this.calculateDueDate()
-      if(this.state.newTodoName === '' || this.state.newTodoName === undefined){
+      if (this.state.newTodoName === '' || this.state.newTodoName === undefined) {
         alert("Name must not be empty")
         throw new Error("Name must not be empty")
       }
@@ -74,6 +74,41 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       })
     } catch {
       alert('Todo deletion failed')
+    }
+  }
+
+  onDownloadAttachment = async (todoId: string) => {
+    const todo = this.state.todos.find((todo) => todo.todoId === todoId)
+    try {
+      if (todo?.attachmentUrl) {
+        const attUrl = todo.attachmentUrl
+        const attachmentUrlParts = attUrl.split("/");
+        const length = attachmentUrlParts.length;
+        const attachmentId = attachmentUrlParts[length - 1]
+        const downloadLink = await getDownloadUrl(attachmentId, this.props.auth.getIdToken())
+        download(downloadLink, attachmentUrlParts[length - 1])
+      }
+    }
+    catch (err) {
+      alert("Cannot download the attachment image")
+    }
+  }
+
+  onDeleteAttachment = async (todoId: string) => {
+    const todo = this.state.todos.find((todo) => todo.todoId === todoId)
+    try {
+      if (todo?.attachmentUrl) {
+        const attUrl = todo.attachmentUrl
+        const attachmentUrlParts = attUrl.split("/");
+        const length = attachmentUrlParts.length;
+        const attachmentId = attachmentUrlParts[length - 1];
+        console.log("attachmentId delete" + attachmentId )
+        await deleteAttachment(attachmentId, this.props.auth.getIdToken())
+        
+      }
+    }
+    catch (err) {
+      alert("Cannot delete the attachment image")
     }
   }
 
@@ -198,9 +233,30 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
+
               {todo.attachmentUrl && (
                 <Image src={todo.attachmentUrl} size="small" wrapped />
               )}
+
+              {todo.attachmentUrl && (
+              
+              <Grid.Column width={1} floated="left" >
+                <Button
+                  icon
+                  color="green"
+                  onClick={() => this.onDownloadAttachment(todo.todoId)}
+                >
+                  <Icon name="download" />
+                </Button>
+                <Button
+                  icon
+                  color="yellow"
+                  onClick={() => this.onDeleteAttachment(todo.todoId)}
+                >
+                  <Icon name="delete" />
+                </Button>
+              </Grid.Column>
+                )}
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>
