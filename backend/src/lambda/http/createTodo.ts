@@ -10,15 +10,15 @@ export const handler = middy( async (event: APIGatewayProxyEvent): Promise<APIGa
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
     // Return error if todo name is empty
-    if(newTodo.name == '' || newTodo.name == undefined){
-      return {
-        statusCode: 400,
-        headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-        body: "Todo name cannot be empty"
-      }
-    }
+    // if(newTodo.name == '' || newTodo.name == undefined){
+    //   return {
+    //     statusCode: 400,
+    //     headers: {
+    //     'Access-Control-Allow-Origin': '*'
+    //   },
+    //     body: "Todo name cannot be empty"
+    //   }
+    // }
     // TODO: Implement creating a new TODO item
     const userId = getUserId(event)
     const item = await createTodo(userId, newTodo)

@@ -116,7 +116,7 @@ functions:
           authorizer: Auth
           reqValidatorName: RequestBodyValidator
           request:
-            schemas:
+            schema:
               application/json: ${file(models/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
@@ -135,7 +135,7 @@ functions:
           authorizer: Auth
           reqValidatorName: RequestBodyValidator
           request:
-            schemas:
+            schema:
               application/json: ${file(models/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
