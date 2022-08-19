@@ -104,7 +104,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         const attachmentId = attachmentUrlParts[length - 1];
         console.log("attachmentId delete" + attachmentId )
         await deleteAttachment(attachmentId, this.props.auth.getIdToken())
-        
+        this.componentDidMount()
       }
     }
     catch (err) {
